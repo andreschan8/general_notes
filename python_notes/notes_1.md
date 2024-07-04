@@ -1,6 +1,6 @@
 # Python Notes - Notes 1
 
-## 1. Inner workkings of for loops
+## 1.1. Inner workings of for loops
 
 We want to understand the way for loops internally work in python. According to [1], they work using iterators and we can mimic their functioning through the following block of code:
 ```python
@@ -62,9 +62,48 @@ class SequenceIterator:
         else:
             raise StopIteration
 ```
+First, note that in the snippet `self._sequence = sequence` we are creating a new reference for the element stored in the `sequence` variable. It's the same as creating and initializaing a variable, say `x=4`, and then creating a new one in terms of the first, that is, `y=x`. On the other hand, a Python iterator is created when we pass in an iterable (an array, for example) to the `iter()` built-in function. This returns the iterator (as we can see from the `__iter__()` method.) Therefore, we could get the following behaviour:
+```python
+>>>arr = ['a','b','c','d']
+>>>iterator = iter(arr)
+>>>print(next(iterator))
+'a'
+>>>arr[1] = 6
+>>>print(next(iterator))
+6
+```
+Here we are modifying the sequence parameter of the iterator without explicitly modifying `iterator`. 
 
-|header1|header|header3|
-|-------|------|-------|
+Now we're ready to analyze the loop in which the first element is removed in each iteration. For easier reference we've placed the corresponding code below.
+
+```python
+def my_for(iterable, func):
+    iterator = iter(iterable)
+    done_looping = False
+    while not done_looping:
+        try:
+            item = next(iterator)
+        except StopIteration:
+            done_looping = True
+        else:
+            func(iterable, item)
+
+#Driver code
+arr = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n']
+
+def my_function(iterable, item):
+    print(item,end=' ')
+    iterable.pop(0)
+
+my_for(arr, my_function)
+```
+When we first call `my_for()` the loop starts and `item` is 'a'. Then we print it and remove it from `arr`, but `iterator._index` is 1 according to the definition of the `SequenceIterator` class (CAREFUL: apparently, Python's `iter()` function has other names for these variables, but for simplicity we are assuming they are the same as those from a `SequenceIterator` instance. Trying to print `iterator._index` would throw an error!) 
+
+|iterator._index|item|arr[0]|
+|---------------|----|------|
+|0              |'a' |'a'   |
+|1              |'c' |'b'   |
+|2              |'e' |'c'   |
 
 ## References
 [1] https://www.geeksforgeeks.org/understanding-for-loop-in-python/
