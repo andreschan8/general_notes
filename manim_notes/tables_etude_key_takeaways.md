@@ -27,8 +27,8 @@ class LocFunction(Scene):
             col_labels=list(map(Text,df.columns)),
             #add_background_rectangles_to_entries=True
         )
-    #Write table on screen
-    self.play(Write(table.scale(0.7)))
+        #Write table on screen
+        self.play(Write(table.scale(0.7)))
 ```
 Key takeaways:
 * Use `to_numpy()` to convert the dataframe to a numpy array. The elements of this array will be all of type `str`.
